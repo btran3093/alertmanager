@@ -1,0 +1,11 @@
+groups:
+  - name: core.windows.alert.rules
+    rules:
+      - alert: "Windows Automatic Service Down - Gaming"
+        expr: windows_service_state{job="gaming-exporter",state="stopped"} * on(instance, name) group_left(start_mode) windows_service_start_mode{job="gaming-exporter",start_mode="auto",name!~"sppsvc|remoteregistry|fsprocsvc|shellhwdetection|winrm|trustedinstaller|btmonitor|btservice|wbiosrvc|mapsbroker|sqltelemetry|gupdate|clr_optimization_v4.0.30319_32|clr_optimization_v4.0.30319_64|bmr boot service|ssistelemetry140|ssistelemetry130|mssqlfdlauncher|edgeupdate|cdpsvc|bits|msdtsserver150|msdtsse40|tiledatamodelsvc|ssistelemetry150|ccmexec|oracleodacmtsrecoveryservice|consulservice|msdtsserver130|enstart64|google.+"} == 1
+        for: 45s
+        labels:
+          severity: "critical"
+        annotations:
+          summary: "{{ $labels.process }} is not running on the following computer: {{ $labels.instance }})"
+          description: "A Windows Service that is set to Automatic is not running.  Please investigate"

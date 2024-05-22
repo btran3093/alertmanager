@@ -1,0 +1,22 @@
+global:
+  smtp_smarthost: 'smtp2.wynnlv.com:25'
+  smtp_from: 'ITSiteReliability@wynnlasvegas.com'
+  resolve_timeout: 5m
+templates:
+- '/etc/alertmanager/templates/*.tmpl'
+route:
+  group_by: ['alertname','instance','name']
+  group_wait: 10s
+  group_interval: 5m
+  routes:
+    - match:
+       alertname: 'Windows Automatic Service Down'
+      receiver: Windows_Service_Down
+- name: Windows_Service_Down
+  pagerduty_configs:
+   - service_key: '565ca8ab66e14907d0f08893d4de20df'
+     send_resolved: true
+     details:
+       firing: '{{ template "pagerduty.default.instances" .Alerts.Firing }}'
+       nodename: '{{ .CommonLabels.servername }}'
+       description: '{{ .CommonLabels.servername }}'
